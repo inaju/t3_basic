@@ -1,4 +1,4 @@
-import { SignIn, SignInButton } from "@clerk/nextjs";
+import { SignIn, SignInButton, SignOutButton } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
