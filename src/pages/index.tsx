@@ -1,7 +1,8 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
-import { RouterOutputs, api } from "~/utils/api";
+import { api } from "~/utils/api";
+import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
@@ -17,9 +18,9 @@ const CreatePostWizard = () => {
   if (!user) return null;
   const ctx = api.useContext();
   const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setInput("");
-      ctx.posts.getAll.invalidate();
+      await ctx.posts.getAll.invalidate();
     },
   });
 
@@ -28,7 +29,7 @@ const CreatePostWizard = () => {
       <Image
         className="flex h-12 w-12 rounded-full"
         src={user.profileImageUrl}
-        alt={`@${user.username}'s profile image`}
+        alt={`@${user.username as string}'s profile image`}
         width={48}
         height={48}
       />
@@ -83,7 +84,7 @@ const Feed = () => {
   return (
     <div className="flex flex-col justify-center">
       {dataEntry?.map((fullPost) => (
-        <PostView {...fullPost} />
+        <PostView {...fullPost} key={fullPost.post.id} />
       ))}
     </div>
   );

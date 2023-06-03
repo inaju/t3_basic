@@ -1,6 +1,5 @@
 import React from "react";
 
-type Props = {};
 
 const LoadingSpinner = (props: { size?: number }) => {
   return (
@@ -33,7 +32,7 @@ export default LoadingSpinner;
 export const LoadingPage = () => {
   return (
     <div className="translateX-[50%] translateY-[50%] absolute left-[48%]  top-[50%] flex transform  items-center">
-      {" "}
+ 
       <LoadingSpinner size={60} />
     </div>
   );
