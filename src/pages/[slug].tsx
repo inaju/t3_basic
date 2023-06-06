@@ -4,6 +4,20 @@ import { api } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
+
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({ userId: props.userId })
+  if (isLoading) return <LoadingPage />
+
+  if (!data || data.length === 0) return <div>User has not posted</div>
+
+  return (
+    <div className="flex flex-col">
+      {data.map(((fullPost) => (<PostView  {...fullPost} key={fullPost.post.id} />)))}
+
+    </div>
+  )
+};
 const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   // if (!postLoaded && !userLoaded) return <LoadingPage />;
   console.log(username, 'username')
@@ -29,16 +43,16 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
             height={96}
             className="-mb-[48px] rounded-full border-4 border-black absolute bottom-0 left-0 ml-4 "
             alt={`${data.username ?? ""}'s profile pic`} src={data.profileImageUrl} />
-          </div>
-          <div className="h-[64px]">
+        </div>
+        <div className="h-[64px]">
 
-          </div>
-          <div className="p-4 text-2xl">
+        </div>
+        <div className="p-4 text-2xl">
 
-            { `@${data.firstName}`}
-          </div>
-          <div className="w-full border-b border-slate-100"></div>
-
+          {`@${data.firstName}`}
+        </div>
+        <div className="w-full border-b border-slate-100"></div>
+        <ProfileFeed userId={data.id} />
       </PageLayout>
 
     </>
@@ -51,6 +65,8 @@ import { prisma } from "~/server/db"
 import SuperJSON from "superjson";
 import { PageLayout } from "./layout";
 import Image from "next/image";
+import { LoadingPage } from "~/components/loading";
+import { PostView } from "~/components/postview";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const helpers = createServerSideHelpers({
