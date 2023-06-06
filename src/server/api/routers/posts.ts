@@ -25,7 +25,6 @@ const ratelimit = new Ratelimit({
   prefix: "@upstash/ratelimit",
 });
 
-
 export const postsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
@@ -42,7 +41,6 @@ export const postsRouter = createTRPCRouter({
 
     return posts.map((post) => {
       const author = users.find((user) => user.id === post.authorId);
-      console.log(users, "users");
       if (!author || !author.username)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -58,6 +56,7 @@ export const postsRouter = createTRPCRouter({
       };
     });
   }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -65,12 +64,18 @@ export const postsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const authorId = ctx.userId;
+      const authorId = ctx.userId!;
 
-      const { success } = await ratelimit.limit(authorId);
+      // const { success } = await ratelimit.limit(authorId);
 
-      if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
-
+      // if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+      // console.log(
+      //   {
+      //     authorId,
+      //     content: input.content,
+      //   },
+      //   "contentsss"
+      // );
       const post = await ctx.prisma.post.create({
         data: {
           authorId,

@@ -75,7 +75,6 @@ type PostWithUser = RouterOutputs["posts"]["getAll"][number];
 
 const PostView = (props: PostWithUser) => {
   const { post, author } = props;
-  console.log(author, "author");
   return (
     <div className="flex gap-3 border-b border-slate-400 p-8">
       <Image
@@ -105,11 +104,9 @@ const PostView = (props: PostWithUser) => {
 const Feed = () => {
   const { data, isLoading: postLoading } = api.posts.getAll.useQuery();
   const dataEntry = data!;
-  console.log(postLoading, "postLoading");
   if (postLoading) return <LoadingPage />;
 
   if (!dataEntry) return <div>something went wrong</div>;
-  console.log(data, "data");
 
   return (
     <div className="flex flex-col justify-center">

@@ -1,15 +1,16 @@
-import { type NextPage } from "next";
+import { GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
 import { api } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-const ProfilePage: NextPage = () => {
+const ProfilePage: NextPage<{username:string}> = ({username}) => {
   // if (!postLoaded && !userLoaded) return <LoadingPage />;
+  console.log(username,'username')
   const { data, isLoading } = api.profile.getUserByUserName.useQuery({
-    username: "Mitchel",
+    username
   });
-  
+  console.log(data, 'data')
   if (isLoading) return <div>Loading...</div>;
   if (!data) return <div>404</div>;
 
@@ -24,10 +25,41 @@ const ProfilePage: NextPage = () => {
       <main className="flex h-screen justify-center">
         <div className="w-full border-x border-slate-400 md:max-w-2xl">
           <div>Profile View</div>
+          {data.firstName}
         </div>
       </main>
     </>
   );
 };
 
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import { appRouter } from "~/server/api/root";
+import { prisma } from "~/server/db"
+import SuperJSON from "superjson";
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { prisma, userId: null },
+    transformer: SuperJSON, // optional - adds superjson serialization
+  });
+
+  const slug = context.params?.slug as string
+  console.log(slug, 'slug')
+  if (!slug) throw new Error("no Slug")
+
+  const username=slug.replace("@","")
+  await helpers.profile.getUserByUserName.prefetch({ username })
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+      username
+    }
+  }
+}
+
+export const getStaticPaths =  () => {
+  return { paths: [], fallback: "blocking" }
+}
 export default ProfilePage;

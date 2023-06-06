@@ -18,21 +18,22 @@ export const profileRouter = createTRPCRouter({
     )
 
     .query(async ({ input }) => {
-      const [user] = await clerkClient.users.getUserList({
-        username: [input.username],
-      });
+      const totalUsers=await clerkClient.users.getUserList()
+      const user=totalUsers.filter((item)=>item.firstName==input.username)[0]
+
+      // const [user] = await clerkClient.users.getUserList({
+      //   username: [input.username],
+      // });
      
-      console.log(user, "user");
-      console.log(input.username, "input.username");
+    
+        if (!user) {
+          console.log(user,'profile user')
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "user not found",
+          });
+        }
 
-      //   if (!user) {
-      //     console.log(user,'profile user')
-      //     throw new TRPCError({
-      //       code: "INTERNAL_SERVER_ERROR",
-      //       message: "user not found",
-      //     });
-      //   }
-
-      return filterUserForClient(user!);
+      return filterUserForClient(user);
     }),
 });
