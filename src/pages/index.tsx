@@ -11,6 +11,7 @@ import { Post } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { PageLayout } from "./layout";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -125,9 +126,8 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <main className="flex h-screen justify-center">
-        <div className="w-full border-x border-slate-400 md:max-w-2xl">
-          <div className="border-b border-slate-400 p-4 ">
+    <PageLayout>
+    <div className="border-b border-slate-400 p-4 ">
             {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
@@ -137,8 +137,8 @@ const Home: NextPage = () => {
             {!!isSignedIn && <CreatePostWizard />}
           </div>
           <Feed />
-        </div>
-      </main>
+          </PageLayout>
+
     </>
   );
 };

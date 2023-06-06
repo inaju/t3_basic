@@ -4,9 +4,9 @@ import { api } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-const ProfilePage: NextPage<{username:string}> = ({username}) => {
+const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   // if (!postLoaded && !userLoaded) return <LoadingPage />;
-  console.log(username,'username')
+  console.log(username, 'username')
   const { data, isLoading } = api.profile.getUserByUserName.useQuery({
     username
   });
@@ -22,12 +22,25 @@ const ProfilePage: NextPage<{username:string}> = ({username}) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex h-screen justify-center">
-        <div className="w-full border-x border-slate-400 md:max-w-2xl">
-          <div>Profile View</div>
-          {data.firstName}
-        </div>
-      </main>
+      <PageLayout>
+        <div className="relative h-36 bg-slate-600">
+          <Image
+            width={96}
+            height={96}
+            className="-mb-[48px] rounded-full border-4 border-black absolute bottom-0 left-0 ml-4 "
+            alt={`${data.username ?? ""}'s profile pic`} src={data.profileImageUrl} />
+          </div>
+          <div className="h-[64px]">
+
+          </div>
+          <div className="p-4 text-2xl">
+
+            { `@${data.firstName}`}
+          </div>
+          <div className="w-full border-b border-slate-100"></div>
+
+      </PageLayout>
+
     </>
   );
 };
@@ -36,6 +49,8 @@ import { createServerSideHelpers } from '@trpc/react-query/server';
 import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db"
 import SuperJSON from "superjson";
+import { PageLayout } from "./layout";
+import Image from "next/image";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const helpers = createServerSideHelpers({
@@ -48,7 +63,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   console.log(slug, 'slug')
   if (!slug) throw new Error("no Slug")
 
-  const username=slug.replace("@","")
+  const username = slug.replace("@", "")
   await helpers.profile.getUserByUserName.prefetch({ username })
 
   return {
@@ -59,7 +74,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export const getStaticPaths =  () => {
+export const getStaticPaths = () => {
   return { paths: [], fallback: "blocking" }
 }
 export default ProfilePage;
